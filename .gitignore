@@ -1,0 +1,4 @@
+# Project exclude paths
+/test_data/
+/train_data/
+/venv/
