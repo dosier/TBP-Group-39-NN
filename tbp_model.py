@@ -26,17 +26,8 @@ def split_sequences(sequences, n_steps):
     return array(X), array(y)
 
 
-def read_data(path):
-    all_files = glob.glob(path + "/*.csv")
-    li = []
-    for filename in all_files:
-        df = pandas.read_csv(filename, index_col=None, header=0, nrows=392)
-        li.append(df)
-    return pandas.concat(li, axis=0, ignore_index=True).to_numpy()
-
-
-test_frame = read_data(path='test_data')
-train_frame = read_data(path='train_data')
+test_frame = pandas.read_csv("test_data.csv", index_col=None, header=0).to_numpy()
+train_frame = pandas.read_csv("train_data.csv", index_col=None, header=0).to_numpy()
 
 # choose a number of time steps
 n_steps = 1
@@ -56,32 +47,30 @@ n_output = y_train.shape[1]
 logdir = "logs/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
 
-
-
 model = Sequential()
-model.add(Dense(128, activation='relu', input_dim=n_input))
-model.add(Dense(128, activation='relu', input_dim=n_input))
-model.add(Dense(128, activation='relu', input_dim=n_input))
-model.add(Dense(128, activation='relu', input_dim=n_input))
-model.add(Dense(128, activation='relu', input_dim=n_input))
-model.add(Dense(128, activation='relu', input_dim=n_input))
-model.add(Dense(128, activation='relu', input_dim=n_input))
-model.add(Dense(128, activation='relu', input_dim=n_input))
-model.add(Dense(128, activation='relu', input_dim=n_input))
-model.add(Dense(128, activation='relu', input_dim=n_input))
+model.add(Dense(120, activation='relu', input_dim=n_input))
+model.add(Dense(120, activation='relu', input_dim=n_input))
+model.add(Dense(120, activation='relu', input_dim=n_input))
+model.add(Dense(120, activation='relu', input_dim=n_input))
+model.add(Dense(120, activation='relu', input_dim=n_input))
+model.add(Dense(120, activation='relu', input_dim=n_input))
+model.add(Dense(120, activation='relu', input_dim=n_input))
+model.add(Dense(120, activation='relu', input_dim=n_input))
+model.add(Dense(120, activation='relu', input_dim=n_input))
+model.add(Dense(120, activation='relu', input_dim=n_input))
 model.add(Dense(n_output))
 model.compile(optimizer='adam', loss='mse')
 
 model.fit(
     X_train,
     y_train,
-    epochs=500,
+    epochs=30,
     verbose=2,
     validation_data=(X_test, y_test),
     callbacks=[tensorboard_callback]
 )
 
-model.save("tbp-op-overload")
+model.save("tbp-july-5-04_47")
 
 # demonstrate prediction
 x_input = array([[1, 0, 0, 0, -1.256262e-01, 1.819678e-01, 0, 0, -8.743738e-01, -1.181968e+00, 0, 0]])
