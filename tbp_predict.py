@@ -3,12 +3,11 @@ import csv
 from numpy import array
 from tensorflow import keras
 
-model = keras.models.load_model("tbp-rnn-overload")
+model = keras.models.load_model("tbp-july-5-04_47")
 
 n_input = 12
 x_input = array([[1, 0, 0, 0, -4.342523e-01, 6.383026e-02, 0, 0, -5.657477e-01, -1.063830e+00, 0, 0]])
-x_input = x_input.reshape((1, x_input.shape[0], n_input))
-print(x_input.shape)
+x_input = x_input.reshape((1, n_input))
 
 with open("out2.csv", 'w', newline='') as f:
     writer = csv.writer(f)
