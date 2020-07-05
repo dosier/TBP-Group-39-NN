@@ -17,12 +17,16 @@ def split_sequences(sequences, n_steps):
         # find the end of this pattern
         end_ix = i + n_steps
         # check if we are beyond the dataset
-        if end_ix > l - 1:
+        if end_ix + 1 >= l - 1:
             break
-        # gather input and output parts of the pattern
-        seq_x, seq_y = sequences[i:end_ix, :], sequences[end_ix, :]
-        X.append(seq_x)
-        y.append(seq_y)
+
+        if i != 0 and i % 500 == 0:
+            print("excluding value at %d\n", i)
+        else:
+            seq_x, seq_y = sequences[i:end_ix, :], sequences[end_ix, :]
+            X.append(seq_x)
+            y.append(seq_y)
+
     return array(X), array(y)
 
 
@@ -48,23 +52,18 @@ logdir = "logs/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
 
 model = Sequential()
-model.add(Dense(120, activation='relu', input_dim=n_input))
-model.add(Dense(120, activation='relu', input_dim=n_input))
-model.add(Dense(120, activation='relu', input_dim=n_input))
-model.add(Dense(120, activation='relu', input_dim=n_input))
-model.add(Dense(120, activation='relu', input_dim=n_input))
-model.add(Dense(120, activation='relu', input_dim=n_input))
-model.add(Dense(120, activation='relu', input_dim=n_input))
-model.add(Dense(120, activation='relu', input_dim=n_input))
-model.add(Dense(120, activation='relu', input_dim=n_input))
-model.add(Dense(120, activation='relu', input_dim=n_input))
+model.add(Dense(38, activation='relu', input_dim=n_input))
+model.add(Dense(38, activation='relu', input_dim=n_input))
+model.add(Dense(38, activation='relu', input_dim=n_input))
+model.add(Dense(38, activation='relu', input_dim=n_input))
+model.add(Dense(38, activation='relu', input_dim=n_input))
 model.add(Dense(n_output))
 model.compile(optimizer='adam', loss='mse')
 
 model.fit(
     X_train,
     y_train,
-    epochs=30,
+    epochs=5,
     verbose=2,
     validation_data=(X_test, y_test),
     callbacks=[tensorboard_callback]
