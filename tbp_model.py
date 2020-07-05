@@ -35,8 +35,8 @@ def read_data(path):
     return pandas.concat(li, axis=0, ignore_index=True).to_numpy()
 
 
-test_frame = read_data(path='test_data')
-train_frame = read_data(path='train_data')
+test_frame = read_data(path='C:\\Users\\gasto\\Documents\\NeuralNetworks\\TBP-Group-39\\Test_data')
+train_frame = read_data(path='C:\\Users\\gasto\\Documents\\NeuralNetworks\\TBP-Group-39\\ready_data')
 
 # choose a number of time steps
 n_steps = 1
@@ -53,10 +53,11 @@ X_test = X_test.reshape((X_test.shape[0], n_input))
 
 n_output = y_train.shape[1]
 
-logdir = "logs/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+logdir = "logs\scalars" + datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
 
-
+print(X_train.shape)
+print(y_train.shape)
 
 model = Sequential()
 model.add(Dense(128, activation='relu', input_dim=n_input))
@@ -75,7 +76,7 @@ model.compile(optimizer='adam', loss='mse')
 model.fit(
     X_train,
     y_train,
-    epochs=500,
+    epochs=100,
     verbose=2,
     validation_data=(X_test, y_test),
     callbacks=[tensorboard_callback]
