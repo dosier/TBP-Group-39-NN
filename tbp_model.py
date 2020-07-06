@@ -1,13 +1,15 @@
-# multivariate output data prep
-from datetime import datetime
-import glob
+import os
+
+os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
+import keras
+
+from tbp_predict import predict
 
 import pandas
 from numpy import array
 # split a multivariate sequence into samples
-from tensorflow import keras
-from tensorflow.python.keras.layers import Dense
-from tensorflow.python.keras.models import Sequential
+from keras.layers import Dense
+from keras.models import Sequential
 
 
 def split_sequences(sequences, n_steps):
@@ -20,8 +22,8 @@ def split_sequences(sequences, n_steps):
         if end_ix + 1 >= l - 1:
             break
 
-        if i != 0 and i % 500 == 0:
-            print("excluding value at %d\n", i)
+        if i != 0 and (i == 390 or i % 390 == 0):
+            continue
         else:
             seq_x, seq_y = sequences[i:end_ix, :], sequences[end_ix, :]
             X.append(seq_x)
@@ -48,41 +50,34 @@ X_test = X_test.reshape((X_test.shape[0], n_input))
 
 n_output = y_train.shape[1]
 
-logdir = "logs/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")
-tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
-
 model = Sequential()
-model.add(Dense(38, activation='relu', input_dim=n_input))
-model.add(Dense(38, activation='relu', input_dim=n_input))
-model.add(Dense(38, activation='relu', input_dim=n_input))
-model.add(Dense(38, activation='relu', input_dim=n_input))
-model.add(Dense(38, activation='relu', input_dim=n_input))
+model.add(Dense(128, activation='relu', input_dim=n_input))
+model.add(Dense(128, activation='relu', input_dim=n_input))
+model.add(Dense(128, activation='relu', input_dim=n_input))
+model.add(Dense(128, activation='relu', input_dim=n_input))
+model.add(Dense(128, activation='relu', input_dim=n_input))
+model.add(Dense(128, activation='relu', input_dim=n_input))
+model.add(Dense(128, activation='relu', input_dim=n_input))
+model.add(Dense(128, activation='relu', input_dim=n_input))
+model.add(Dense(128, activation='relu', input_dim=n_input))
+model.add(Dense(128, activation='relu', input_dim=n_input))
 model.add(Dense(n_output))
-model.compile(optimizer='adam', loss='mse')
+model.compile(optimizer='adam', loss='mean_absolute_error')
+
+
+class PredictionCallback(keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        predict(self.model, epoch)
+
 
 model.fit(
     X_train,
     y_train,
-    epochs=5,
+    batch_size=5000,
+    epochs=500,
     verbose=2,
     validation_data=(X_test, y_test),
-    callbacks=[tensorboard_callback]
+    callbacks=[PredictionCallback()]
 )
 
-model.save("tbp-july-5-04_47")
-
-# demonstrate prediction
-x_input = array([[1, 0, 0, 0, -1.256262e-01, 1.819678e-01, 0, 0, -8.743738e-01, -1.181968e+00, 0, 0]])
-x_input = x_input.reshape((1, n_input))
-yhat = model.predict(x_input, verbose=1)
-print(yhat)
-
-x_input = array([[9.999751e-01, 2.162537e-06, -5.117588e-03, 4.452208e-04, -3.818625e-01, 6.328183e-01, 3.629409e-03,
-                  -3.613076e-03, -6.181126e-01, -1.632820e+00, 1.488179e-03, 3.167855e-03]])
-x_input = x_input.reshape((1, n_input))
-yhat = model.predict(x_input, verbose=2)
-print(yhat)
-yhat = model.predict(yhat, verbose=2)
-print(yhat)
-yhat = model.predict(yhat, verbose=2)
-print(yhat)
+model.save("tbp-july-6-06_01")
