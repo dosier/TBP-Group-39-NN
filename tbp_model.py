@@ -6,7 +6,7 @@ os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
 
 import keras
 
-from tbp_predict import predict_multi
+from tbp_predict import predict_multi, predict
 
 import pandas
 from numpy import array
@@ -33,7 +33,6 @@ def split_sequences(sequences, n_steps):
             y.append(seq_y)
 
     return array(X), array(y)
-
 
 test_frame = pandas.read_csv("test_data.csv", index_col=None, header=0).to_numpy()
 train_frame = pandas.read_csv("train_data.csv", index_col=None, header=0).to_numpy()
@@ -74,7 +73,10 @@ name = "tbp-mlp-10-layers-128-units-multi-in-2"
 
 class PredictionCallback(keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
-        predict_multi(self.model, epoch + 1, X_test[0])
+        if n_steps == 1:
+            predict(self.model, epoch + 1)
+        else:
+            predict_multi(self.model, epoch + 1, X_test[0])
 
 
 history = model.fit(
