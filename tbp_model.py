@@ -3,7 +3,7 @@ import os
 os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
 import keras
 
-from tbp_predict import predict
+from tbp_predict import predict_multi
 
 import pandas
 from numpy import array
@@ -22,7 +22,7 @@ def split_sequences(sequences, n_steps):
         if end_ix + 1 >= l - 1:
             break
 
-        if i != 0 and (i == 390 or i % 390 == 0):
+        if i != 0 and i % 390 == 0:
             continue
         else:
             seq_x, seq_y = sequences[i:end_ix, :], sequences[end_ix, :]
@@ -36,7 +36,7 @@ test_frame = pandas.read_csv("test_data.csv", index_col=None, header=0).to_numpy
 train_frame = pandas.read_csv("train_data.csv", index_col=None, header=0).to_numpy()
 
 # choose a number of time steps
-n_steps = 1
+n_steps = 10
 
 # convert into input/output
 X_train, y_train = split_sequences(train_frame, n_steps)
@@ -64,20 +64,25 @@ model.add(Dense(128, activation='relu', input_dim=n_input))
 model.add(Dense(n_output))
 model.compile(optimizer='adam', loss='mean_absolute_error')
 
+print(model.summary())
+
+name = "tbp-mlp-10-layers-128-units-multi-in"
+
 
 class PredictionCallback(keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
-        predict(self.model, epoch)
+        predict_multi(self.model, epoch + 1, X_test[0])
 
 
 model.fit(
     X_train,
     y_train,
-    batch_size=5000,
+    batch_size=3900,
     epochs=500,
     verbose=2,
+    # shuffle='batch',
     validation_data=(X_test, y_test),
     callbacks=[PredictionCallback()]
 )
 
-model.save("tbp-july-6-06_01")
+model.save(name + ".h5")
