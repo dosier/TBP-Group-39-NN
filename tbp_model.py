@@ -1,6 +1,9 @@
 import os
 
+import numpy
+
 os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
+
 import keras
 
 from tbp_predict import predict_multi
@@ -66,7 +69,7 @@ model.compile(optimizer='adam', loss='mean_absolute_error')
 
 print(model.summary())
 
-name = "tbp-mlp-10-layers-128-units-multi-in"
+name = "tbp-mlp-10-layers-128-units-multi-in-2"
 
 
 class PredictionCallback(keras.callbacks.Callback):
@@ -74,15 +77,15 @@ class PredictionCallback(keras.callbacks.Callback):
         predict_multi(self.model, epoch + 1, X_test[0])
 
 
-model.fit(
+history = model.fit(
     X_train,
     y_train,
     batch_size=3900,
     epochs=500,
     verbose=2,
-    # shuffle='batch',
     validation_data=(X_test, y_test),
     callbacks=[PredictionCallback()]
 )
 
 model.save(name + ".h5")
+numpy.save(name+'_history.npy', history.history)
