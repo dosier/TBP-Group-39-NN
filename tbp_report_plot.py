@@ -3,9 +3,10 @@ import matplotlib.path as mpath
 import matplotlib.pyplot as plt
 
 
-def label(xy, text):
-    y = xy[1] - 0.15  # shift y-value for label so that it's below the artist
-    plt.text(xy[0], y, text, ha="center", family='sans-serif', size=14)
+def label(xy, dxy, text):
+    x = xy[0] + dxy[0]
+    y = xy[1] + dxy[1]  # shift y-value for label so that it's below the artist
+    plt.text(x, y, text, ha="center", family='sans-serif', size=14, color='white')
 
 
 ax = plt.gca()
@@ -22,20 +23,22 @@ path_data = [
 ]
 codes, vertices = zip(*path_data)
 path = mpath.Path(vertices, codes)
-patch = mpatches.PathPatch(path, color='grey')
+patch = mpatches.PathPatch(path, color=u'#ff7f0e', alpha=0.2)
 ax.add_patch(patch)
 
-ax.add_patch(mpatches.FancyArrow(0.0, 0.0, 1.0 - 0.120, 0.0, width=0.005, head_width=0.05, color='black'))
-ax.add_patch(mpatches.FancyArrow(0.0, 0.0, -0.25 + 0.095, 0.25 - 0.095, width=0.005, head_width=0.05, color='black'))
-ax.add_patch(mpatches.FancyArrow(0.0, 0.0, -0.75 + .1125, -0.25 + .0375, width=0.005, head_width=0.05, color='black'))
+ax.add_patch(mpatches.FancyArrow(0.0, 0.0, 1.0 - 0.120, 0.0, width=0.005, head_width=0.05, color='grey'))
+ax.add_patch(mpatches.FancyArrow(0.0, 0.0, -0.25 + 0.095, 0.25 - 0.095, width=0.005, head_width=0.05, color='grey'))
+ax.add_patch(mpatches.FancyArrow(0.0, 0.0, -0.75 + .1125, -0.25 + .0375, width=0.005, head_width=0.05, color='grey'))
 
 # add an ellipse
-ax.add_patch(mpatches.Ellipse((1.0, 0.0), 0.075, 0.075, color='blue'))
-ax.add_patch(mpatches.Ellipse((-0.25, 0.25), 0.075, 0.075, color='orange'))
-ax.add_patch(mpatches.Ellipse((-0.75, -0.25), 0.075, 0.075, color='green'))
+ax.add_patch(mpatches.Ellipse((1.0, 0.0), 0.075, 0.075, color=u'#1f77b4'))
+ax.add_patch(mpatches.Ellipse((-0.25, 0.25), 0.075, 0.075, color=u'#ff7f0e'))
+ax.add_patch(mpatches.Ellipse((-0.75, -0.25), 0.075, 0.075, color=u'#2ca02c'))
 
-label((1.0, 0.0), "b1")
-label((-0.25, 0.25), "b2")
-label((-0.75, -0.25), "b3")
+ax.set_facecolor('xkcd:charcoal')
+
+label((1.0, 0.0), (0, -.15), "b1")
+label((-0.25, 0.25), (0, .10), "b2")
+label((-0.75, -0.25), (0, -.15), "b3")
 
 plt.show()
